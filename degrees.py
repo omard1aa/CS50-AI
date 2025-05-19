@@ -100,17 +100,20 @@ def shortest_path(source, target):
         curNode = imdbFrontier.remove()
         if curNode.state == target:
             return backTrack(curNode)
-        for movie_id, person_id in neighbors_for_person(curNode.state):
+        for (movie_id, person_id) in neighbors_for_person(curNode.state):
             if not person_id in searched:
                 searched.append(person_id)
                 imdbFrontier.add(Node(person_id, curNode, movie_id))
 
+
 def backTrack(node):
     path = []
     while node.parent is not None:
-        path.append((node.action, node.state))
+        path.insert(0, (node.action, node.state))
         node = node.parent
-        return path
+    return path
+
+
 def person_id_for_name(name):
     """
     Returns the IMDB id for a person's name,
