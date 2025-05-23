@@ -3,6 +3,7 @@ Tic Tac Toe Player
 """
 
 import math
+from copy import deepcopy
 
 EMPTY = None
 def initial_state():
@@ -34,15 +35,18 @@ def result(board, action):
     """
     Returns the board that results from making move (i, j) on the board.
     """
-    x, y = action
-    if x > 2 or x < 0 or y > 2 or y < 0:
-        raise Exception("Invalid move: Out of bounds")
- 
-    if board[x][y] is not None:
-        raise Exception("Invalid move, Cell already taken") 
-    
-    board[x][y] = player(board)
-    return board
+
+    new_board = deepcopy(board)
+    i, j = action
+
+    if board[i][j] != None:
+        raise Exception
+    if i < 0 or i > 2 or j < 0 or j > 2:
+        raise Exception
+    else:
+        new_board[i][j] = player(board)
+
+    return new_board
 
 def winner(board):
     """
@@ -51,7 +55,6 @@ def winner(board):
     if utility(board) == 1: return 'X'
     elif utility(board) == -1: return 'O'
     elif(utility(board)) == 0: return None
-    raise NotImplementedError
 
 
 def terminal(board):
@@ -60,11 +63,9 @@ def terminal(board):
     """
     if winner(board) != None:
         return True
-
     for row in board:
         if EMPTY in row:
             return False
-
     return True
 
 
@@ -72,27 +73,12 @@ def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
-    vCheck = checkVertically(board)
-    hCheck = checkHorizontally(board)
-    dCheck = checkDiagonally(board)
-    if hCheck != None:
-        if hCheck == "X":
+    for result in [checkHorizontally(board), checkVertically(board), checkDiagonally(board)]:
+        if result == "X":
             return 1
-        if hCheck == "O":
+        elif result == "O":
             return -1
-        
-    if vCheck != None:
-        if vCheck == "X":
-            return 1
-        if vCheck == "O":
-            return -1
-            
-    if dCheck != None:
-        if dCheck == "X":
-            return 1
-        if dCheck == "O":
-            return -1
-    return 0    
+    return 0
 
 
 def checkHorizontally(board):
@@ -134,24 +120,25 @@ def getXBestMove(board):
     optimalMove = ()
     if terminal(board):
         return utility(board), optimalMove
-    possibleActions = {}
+    
     x = float('-inf')
     for action in actions(board):
-        newBoard = result(board, action)
-        x = max(x, getYBestMove(newBoard)[0])
-        possibleActions[x] = action
-    return max(possibleActions.keys()), possibleActions[min(possibleActions.keys())]
+        minval = getYBestMove(result(board, action))[0]
+        if x < minval:
+            x = minval
+            optimalMove = action
+    return x, optimalMove
 
 def getYBestMove(board):
     optimalMove = ()
     if terminal(board):
         return utility(board), optimalMove
-    possibleActions = {}
+    
     y = float('inf')
     for action in actions(board):
-        newBoard = result(board, action)
-        y = min(y, getXBestMove(newBoard)[0])
-        possibleActions[y] = action
-    return min(possibleActions.keys()), possibleActions[min(possibleActions.keys())]
-
+        maxval = getXBestMove(result(board, action))[0]
+        if y > maxval:
+            y = maxval
+            optimalMove = action
+    return y, optimalMove
     
